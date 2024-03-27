@@ -8,7 +8,7 @@ namespace RecipeAPI.Domain.Profiles
     {
         public UserProfile()
         {
-            CreateMap<UserDTO, ApplicationUser>();
+            CreateMap<UserDTO, ApplicationUser>().ReverseMap();
         }
     }
 }

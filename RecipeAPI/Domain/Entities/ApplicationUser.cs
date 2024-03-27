@@ -9,6 +9,8 @@ namespace RecipeAPI.Domain.Entities
         [StringLength(50)]
         public string UserName { get; set; }
         [StringLength(50)]
+        public string Password { get; set; }
+        [StringLength(50)]
         public string Email { get; set; }
 
         public virtual List<Recipe> UsersRecipes { get; set; }

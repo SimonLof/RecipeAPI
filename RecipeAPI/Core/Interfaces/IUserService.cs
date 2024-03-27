@@ -4,6 +4,10 @@ namespace RecipeAPI.Core.Interfaces
 {
     public interface IUserService
     {
-        public void CreateUser(UserDTO userDTO);
+        Task CreateUser(UserDTO userDTO);
+        Task<List<UserDTO>> GetUsers();
+        Task<UserDTO> UpdateUser(UserDTO user);
+
+        Task<object> Login(UserLoginDTO loginDTO);
     }
 }

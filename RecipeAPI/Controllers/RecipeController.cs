@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace RecipeAPI.Controllers
 {
@@ -6,10 +7,11 @@ namespace RecipeAPI.Controllers
     [ApiController]
     public class RecipeController : ControllerBase
     {
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult GetAllRecipe()
         {
-            return Ok();
+            return Ok("All the recipes");
         }
     }
 }

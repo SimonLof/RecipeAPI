@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RecipeAPI.Core.Interfaces;
 using RecipeAPI.Domain.DTO;
 
 namespace RecipeAPI.Controllers
 {
-    //[Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -15,17 +15,35 @@ namespace RecipeAPI.Controllers
             _userService = userService;
         }
 
+        [Authorize(Roles = "appUser")]
         [HttpGet("/api/users")]
-        public IActionResult GetAllUser()
+        public async Task<IActionResult> GetAllUser()
         {
-            return Ok();
+            var userList = await _userService.GetUsers();
+            return Ok(userList);
         }
 
+        [AllowAnonymous]
         [HttpPost("/api/register")]
-        public IActionResult NewUser([FromBody] UserDTO user)
+        public async Task<IActionResult> NewUser([FromBody] UserDTO user)
         {
-            _userService.CreateUser(user);
-            return Ok();
+            await _userService.CreateUser(user);
+            return Ok(user);
         }
+
+        [AllowAnonymous]
+        [HttpPost("/api/login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginDTO user)
+        {
+            try
+            {
+                return Ok(await _userService.Login(user));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

@@ -11,25 +11,37 @@ namespace RecipeAPI.Data.Repos
             _context = context;
         }
 
-        public void CreateUser(ApplicationUser user)
+        public async Task CreateUser(ApplicationUser user)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            await Task.Run(() =>
+            {
+                _context.Users.Add(user);
+                _context.SaveChanges();
+            });
         }
 
-        public void DeleteUser(ApplicationUser user)
+        public async Task DeleteUser(ApplicationUser user)
         {
             throw new NotImplementedException();
         }
 
-        public List<ApplicationUser> GetUsers()
+        public async Task<List<ApplicationUser>> GetUsers()
         {
-            throw new NotImplementedException();
+            var userList = new List<ApplicationUser>();
+            await Task.Run(() =>
+            {
+                userList = _context.Users.ToList();
+            });
+            return userList;
         }
 
-        public void UpdateUser(ApplicationUser user)
+        public async Task UpdateUser(ApplicationUser user)
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                _context.Users.Add(user);
+                _context.SaveChanges();
+            });
         }
     }
 }
