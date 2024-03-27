@@ -28,7 +28,7 @@ namespace RecipeAPI.Controllers
         public async Task<IActionResult> NewUser([FromBody] UserDTO user)
         {
             await _userService.CreateUser(user);
-            return Ok(user);
+            return StatusCode(201, user);
         }
 
         [AllowAnonymous]
