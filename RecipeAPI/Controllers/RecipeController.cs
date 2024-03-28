@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RecipeAPI.Domain.Entities;
+
+using RecipeAPI.Domain.DTO;
 
 namespace RecipeAPI.Controllers
 {
-    [Route("/")]
     [ApiController]
     public class RecipeController : ControllerBase
     {
@@ -16,12 +16,12 @@ namespace RecipeAPI.Controllers
         }
 
         [Authorize(Roles = "appUser")]
-        [HttpPost]
-        public async Task<IActionResult> CreateNewRecipe([FromBody] Recipe recipe)
+        [HttpPost("/api/recipe/add")]
+        public async Task<IActionResult> CreateNewRecipe([FromBody] RecipeCreationDTO recipe)
         {
             if (recipe == null) return BadRequest("Invalid recipe.");
 
-            return Ok();
+            return Ok(recipe);
         }
     }
 }

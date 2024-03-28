@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using RecipeAPI.Core.Interfaces;
 using RecipeAPI.Domain.DTO;
+
 using System.Security.Claims;
 
 namespace RecipeAPI.Controllers
@@ -17,7 +19,7 @@ namespace RecipeAPI.Controllers
         }
 
         [Authorize(Roles = "appUser")]
-        [HttpPost]
+        [HttpPost("/api/recipe/{recipeID}/rate")]
         public async Task<IActionResult> GiveRating(int rating, int recipeID)
         {
             var newRating = new RatingDTO
