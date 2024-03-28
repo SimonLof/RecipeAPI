@@ -39,7 +39,6 @@ Some more stuff? I don't remember.
 
 - Swagger + SwaggerUI
 - JWT and an example in the testcontroller of how to get userID from the JWT
-- 
 
 #### Todo:
 
