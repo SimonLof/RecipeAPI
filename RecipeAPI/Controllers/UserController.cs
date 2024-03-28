@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RecipeAPI.Core.Interfaces;
 using RecipeAPI.Domain.DTO;
+using System.Security.Claims;
 
 namespace RecipeAPI.Controllers
 {
@@ -19,16 +20,69 @@ namespace RecipeAPI.Controllers
         [HttpGet("/api/users")]
         public async Task<IActionResult> GetAllUser()
         {
-            var userList = await _userService.GetUsers();
-            return Ok(userList);
+            try
+            {
+                var userList = await _userService.GetUsers();
+                return Ok(userList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("/api/{userID}")]
+        public async Task<IActionResult> GetUserFromID(int userID)
+        {
+            try
+            {
+                var user = await _userService.GetUserById(userID);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [Authorize("appUser")]
+        [HttpGet("/api/{userID}/delete")]
+        public async Task<IActionResult> DeleteUser(int userID)
+        {
+            try
+            {
+                var loggedInID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (loggedInID == userID.ToString())
+                {
+                    await _userService.DeleteUser(userID);
+                    return Ok("Your user has been deleted. Be aware that your current JWT might still work for up to 1 hour.");
+                }
+                else
+                {
+                    return BadRequest("You can only delete your own account.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("/api/register")]
         public async Task<IActionResult> NewUser([FromBody] UserDTO user)
         {
-            await _userService.CreateUser(user);
-            return StatusCode(201, user);
+            try
+            {
+                await _userService.CreateUser(user);
+                return StatusCode(201, user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [AllowAnonymous]

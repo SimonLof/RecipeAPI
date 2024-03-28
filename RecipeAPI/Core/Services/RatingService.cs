@@ -1,4 +1,5 @@
-﻿using RecipeAPI.Core.Interfaces;
+﻿using AutoMapper;
+using RecipeAPI.Core.Interfaces;
 using RecipeAPI.Data.Interfaces;
 using RecipeAPI.Domain.DTO;
 using RecipeAPI.Domain.Entities;
@@ -8,10 +9,12 @@ namespace RecipeAPI.Core.Services
     public class RatingService : IRatingService
     {
         private readonly IRatingRepo _ratingRepo;
+        private readonly IMapper _mapper;
 
-        public RatingService(IRatingRepo ratingRepo)
+        public RatingService(IRatingRepo ratingRepo, IMapper mapper)
         {
             _ratingRepo = ratingRepo;
+            _mapper = mapper;
         }
 
         public async Task ChangeRating(RatingDTO ratingDTO)
@@ -19,7 +22,7 @@ namespace RecipeAPI.Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task GiveRating(RatingDTO ratingDTO)
+        public async Task<RecipeViewDTO> GiveRating(RatingDTO ratingDTO)
         {
             var recipe = await _ratingRepo.GetRecipe(ratingDTO.RecipeID)
                 ?? throw new Exception("No recipe with that ID.");
@@ -37,7 +40,7 @@ namespace RecipeAPI.Core.Services
                 Score = ratingDTO.Score,
             };
 
-            await _ratingRepo.PostNewRating(newRating);
+            return _mapper.Map<RecipeViewDTO>(await _ratingRepo.PostNewRating(newRating));
         }
     }
 }

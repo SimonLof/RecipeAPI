@@ -1,4 +1,6 @@
-﻿using RecipeAPI.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipeAPI.Data.Interfaces;
+using RecipeAPI.Domain.DTO;
 using RecipeAPI.Domain.Entities;
 
 namespace RecipeAPI.Data.Repos
@@ -20,9 +22,23 @@ namespace RecipeAPI.Data.Repos
             });
         }
 
-        public async Task DeleteUser(ApplicationUser user)
+        public async Task DeleteUser(int userID)
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                var user = _context.Users.SingleOrDefault(u => u.UserID == userID);
+
+                if (user == null) throw new Exception("User not found");
+
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+            });
+        }
+
+        public async Task<ApplicationUser> Login(UserLoginDTO userLogin)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u =>
+                u.UserName.ToLower() == userLogin.UserName.ToLower() && userLogin.Password == u.Password);
         }
 
         public async Task<List<ApplicationUser>> GetUsers()
@@ -39,9 +55,22 @@ namespace RecipeAPI.Data.Repos
         {
             await Task.Run(() =>
             {
-                _context.Users.Add(user);
+                var original = _context.Users.FirstOrDefault(u => u.UserID == user.UserID);
+
+                if (original is null) throw new Exception("User not found.");
+
+                _context.Entry(original).CurrentValues.SetValues(user);
                 _context.SaveChanges();
             });
+        }
+
+        public async Task<ApplicationUser> GetUserById(int id)
+        {
+            var user = await Task.Run(() => _context.Users.FirstOrDefault(u => u.UserID == id));
+
+            if (user is null) throw new Exception("User not found");
+
+            return user;
         }
     }
 }

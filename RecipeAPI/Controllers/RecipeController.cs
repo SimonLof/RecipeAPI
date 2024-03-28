@@ -1,18 +1,35 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using RecipeAPI.Core.Interfaces;
 using RecipeAPI.Domain.DTO;
+using System.Security.Claims;
 
 namespace RecipeAPI.Controllers
 {
     [ApiController]
     public class RecipeController : ControllerBase
     {
-        [AllowAnonymous]
-        [HttpGet]
-        public IActionResult GetAllRecipe()
+        private readonly IRecipeService _recipeService;
+
+        public RecipeController(IRecipeService recipeService)
         {
-            return Ok("All the recipes");
+            _recipeService = recipeService;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("/api/recipes")]
+        public async Task<IActionResult> GetAllRecipe()
+        {
+            var recipes = await _recipeService.GetAllRecipes();
+
+            return Ok(recipes);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("/api/recipe/{recipeID}")]
+        public async Task<IActionResult> GetRecipe(int recipeID)
+        {
+            return Ok(await _recipeService.GetRecipe(recipeID));
         }
 
         [Authorize(Roles = "appUser")]
@@ -20,8 +37,16 @@ namespace RecipeAPI.Controllers
         public async Task<IActionResult> CreateNewRecipe([FromBody] RecipeCreationDTO recipe)
         {
             if (recipe == null) return BadRequest("Invalid recipe.");
+            try
+            {
+                var createdRecipe = await _recipeService.CreateRecipe(recipe, User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            return Ok(recipe);
+                return Created("", createdRecipe);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

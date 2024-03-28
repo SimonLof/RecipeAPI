@@ -21,11 +21,11 @@ namespace RecipeAPI.Core.Services
             _mapper = mapper;
         }
 
-        public Task CreateUser(UserDTO userDTO)
+        public async Task CreateUser(UserDTO userDTO)
         {
             var user = _mapper.Map<ApplicationUser>(userDTO);
 
-            return _repo.CreateUser(user);
+            await _repo.CreateUser(user);
         }
 
         public async Task<List<UserDTO>> GetUsers()
@@ -42,23 +42,31 @@ namespace RecipeAPI.Core.Services
             return userReturn;
         }
 
-        public Task<UserDTO> UpdateUser(UserDTO user)
+        public async Task<UserDTO> UpdateUser(UserDTO user)
         {
-            throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(user);
+
+            var updateUser = _mapper.Map<ApplicationUser>(user);
+            try
+            {
+                await _repo.UpdateUser(updateUser);
+                return user;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<object> Login(UserLoginDTO loginDTO)
         {
             if (string.IsNullOrEmpty(loginDTO.UserName))
-                throw new ArgumentNullException(paramName: "username");
+                throw new ArgumentNullException(paramName: "loginDTO.UserName");
 
             if (string.IsNullOrEmpty(loginDTO.Password))
-                throw new ArgumentNullException(paramName: "password");
+                throw new ArgumentNullException(paramName: "loginDTO.Password");
 
-            var allUsers = await _repo.GetUsers();
-
-            var user = allUsers.SingleOrDefault(u =>
-                    u.UserName.ToLower() == loginDTO.UserName.ToLower() && u.Password == loginDTO.Password);
+            var user = await _repo.Login(loginDTO);
 
             if (user == null)
                 throw new Exception("Failed login.");
@@ -79,12 +87,30 @@ namespace RecipeAPI.Core.Services
                issuer: "http://localhost:5025/",
                audience: "http://localhost:5025/",
                claims: claims,
-               expires: DateTime.Now.AddMinutes(20),
+               expires: DateTime.Now.AddHours(1),
                signingCredentials: signInCredentials
                 );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
             return new { Token = tokenString };
+        }
+
+
+        public async Task DeleteUser(int userID)
+        {
+            try
+            {
+                await _repo.DeleteUser(userID);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<UserDTO> GetUserById(int userID)
+        {
+            return _mapper.Map<UserDTO>(await _repo.GetUserById(userID));
         }
     }
 }

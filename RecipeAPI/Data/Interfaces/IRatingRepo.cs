@@ -6,6 +6,6 @@ namespace RecipeAPI.Data.Interfaces
     {
         Task<ApplicationUser> GetApplicationUser(int id);
         Task<Recipe> GetRecipe(int id);
-        Task PostNewRating(Rating rating);
+        Task<Recipe> PostNewRating(Rating rating);
     }
 }

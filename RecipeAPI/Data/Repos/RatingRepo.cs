@@ -1,4 +1,5 @@
-﻿using RecipeAPI.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipeAPI.Data.Interfaces;
 using RecipeAPI.Domain.Entities;
 
 namespace RecipeAPI.Data.Repos
@@ -19,17 +20,17 @@ namespace RecipeAPI.Data.Repos
 
         public async Task<Recipe> GetRecipe(int id)
         {
-            return await Task.Run(() => _context.Recipes.SingleOrDefault(r => r.RecipeID == id));
+            return await Task.Run(() => _context.Recipes.Include("User").SingleOrDefault(r => r.RecipeID == id));
         }
 
-        public async Task PostNewRating(Rating rating)
+        public async Task<Recipe> PostNewRating(Rating rating)
         {
             await Task.Run(() =>
             {
                 _context.Ratings.Add(rating);
                 _context.SaveChanges();
-                return Task.CompletedTask;
             });
+            return rating.OnRecipe;
         }
     }
 }

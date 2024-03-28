@@ -6,10 +6,10 @@
         public int RecipeID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Ingredient { get; set; }
+        public string Ingredients { get; set; }
         public List<int> Ratings { get; set; }
-        public int AvgRating { get; set; }
-        public int CategoryID { get; set; }
-        public int UserID { get; set; }
+        public decimal AvgRating { get; set; }
+        public string CategoryName { get; set; }
+        public string UserName { get; set; }
     }
 }

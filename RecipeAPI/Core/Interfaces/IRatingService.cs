@@ -4,7 +4,7 @@ namespace RecipeAPI.Core.Interfaces
 {
     public interface IRatingService
     {
-        Task GiveRating(RatingDTO ratingDTO);
+        Task<RecipeViewDTO> GiveRating(RatingDTO ratingDTO);
         Task ChangeRating(RatingDTO ratingDTO);
     }
 }

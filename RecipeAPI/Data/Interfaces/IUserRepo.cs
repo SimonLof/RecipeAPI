@@ -1,4 +1,5 @@
-﻿using RecipeAPI.Domain.Entities;
+﻿using RecipeAPI.Domain.DTO;
+using RecipeAPI.Domain.Entities;
 
 namespace RecipeAPI.Data.Interfaces
 {
@@ -6,7 +7,9 @@ namespace RecipeAPI.Data.Interfaces
     {
         public Task CreateUser(ApplicationUser user);
         public Task UpdateUser(ApplicationUser user);
-        public Task DeleteUser(ApplicationUser user);
+        public Task DeleteUser(int userID);
+        public Task<ApplicationUser> GetUserById(int id);
         public Task<List<ApplicationUser>> GetUsers();
+        Task<ApplicationUser> Login(UserLoginDTO userLogin);
     }
 }
