@@ -33,6 +33,9 @@ namespace RecipeAPI.Core.Services
             if (recipe.User.UserID == user.UserID)
                 throw new Exception("Cannot rate your own recipe.");
 
+            if (recipe.Ratings.Any(r => r.FromUser.UserID == user.UserID))
+                throw new Exception("Only one rating per recipe allowed.");
+
             var newRating = new Rating
             {
                 FromUser = user,

@@ -19,7 +19,7 @@ namespace RecipeAPI.Controllers
         }
 
         [Authorize(Roles = "appUser")]
-        [HttpPost("/api/recipe/{recipeID}/rate")]
+        [HttpPost("/api/recipe/{recipeID}/rate/{rating}")]
         public async Task<IActionResult> GiveRating(int rating, int recipeID)
         {
             if (rating > 5 || rating < 1) return BadRequest("Rating is a score between 1-5");
@@ -30,9 +30,16 @@ namespace RecipeAPI.Controllers
                 Score = rating,
                 UserID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
             };
+            try
+            {
 
-            var newRecipe = await _ratingService.GiveRating(newRating);
-            return Created("", newRecipe);
+                var newRecipe = await _ratingService.GiveRating(newRating);
+                return Created($"/api/recipe/" + newRecipe.RecipeID, newRecipe);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
