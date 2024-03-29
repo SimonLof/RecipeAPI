@@ -17,7 +17,7 @@ namespace RecipeAPI.Core.Services
             _mapper = mapper;
         }
 
-        public async Task ChangeRating(RatingDTO ratingDTO)
+        public Task ChangeRating(RatingDTO ratingDTO)
         {
             throw new NotImplementedException();
         }

@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RecipeAPI.Data.Interfaces;
+﻿using RecipeAPI.Data.Interfaces;
 using RecipeAPI.Domain.DTO;
 using RecipeAPI.Domain.Entities;
 
@@ -13,64 +12,57 @@ namespace RecipeAPI.Data.Repos
             _context = context;
         }
 
-        public async Task CreateUser(ApplicationUser user)
+        public Task CreateUser(ApplicationUser user)
         {
-            await Task.Run(() =>
-            {
-                _context.Users.Add(user);
-                _context.SaveChanges();
-            });
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteUser(int userID)
+        public Task DeleteUser(int userID)
         {
-            await Task.Run(() =>
-            {
-                var user = _context.Users.SingleOrDefault(u => u.UserID == userID);
+            var user = _context.Users.SingleOrDefault(u => u.UserID == userID);
 
-                if (user == null) throw new Exception("User not found");
+            if (user == null) throw new Exception("User not found");
 
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-            });
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            return Task.CompletedTask;
         }
 
-        public async Task<ApplicationUser> Login(UserLoginDTO userLogin)
+        public Task<ApplicationUser> Login(UserLoginDTO userLogin)
         {
-            return await _context.Users.SingleOrDefaultAsync(u =>
-                u.UserName.ToLower() == userLogin.UserName.ToLower() && userLogin.Password == u.Password);
+            return Task.FromResult<ApplicationUser>(
+                _context.Users.SingleOrDefault(u =>
+                u.UserName.ToLower() == userLogin.UserName.ToLower() &&
+                u.Password == userLogin.Password));
         }
 
-        public async Task<List<ApplicationUser>> GetUsers()
+        public Task<List<ApplicationUser>> GetUsers()
         {
-            var userList = new List<ApplicationUser>();
-            await Task.Run(() =>
-            {
-                userList = _context.Users.ToList();
-            });
-            return userList;
+            var userList = _context.Users.ToList();
+
+            return Task.FromResult(userList);
         }
 
-        public async Task UpdateUser(ApplicationUser user)
+        public Task UpdateUser(ApplicationUser user)
         {
-            await Task.Run(() =>
-            {
-                var original = _context.Users.FirstOrDefault(u => u.UserID == user.UserID);
+            var original = _context.Users.FirstOrDefault(u => u.UserID == user.UserID);
 
-                if (original is null) throw new Exception("User not found.");
+            if (original is null) throw new Exception("User not found.");
 
-                _context.Entry(original).CurrentValues.SetValues(user);
-                _context.SaveChanges();
-            });
+            _context.Entry(original).CurrentValues.SetValues(user);
+            _context.SaveChanges();
+            return Task.CompletedTask;
         }
 
-        public async Task<ApplicationUser> GetUserById(int id)
+        public Task<ApplicationUser> GetUserById(int id)
         {
-            var user = await Task.Run(() => _context.Users.FirstOrDefault(u => u.UserID == id));
+            var user = _context.Users.FirstOrDefault(u => u.UserID == id);
 
             if (user is null) throw new Exception("User not found");
 
-            return user;
+            return Task.FromResult(user);
         }
     }
 }

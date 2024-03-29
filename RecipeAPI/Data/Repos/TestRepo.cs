@@ -12,14 +12,13 @@ namespace RecipeAPI.Data.Repos
             _context = context;
         }
 
-        public async Task<List<RecipeCategory>> GetRecipeCategories()
+        public Task<List<RecipeCategory>> GetRecipeCategories()
         {
             var recipeCategoryList = new List<RecipeCategory>();
-            await Task.Run(() =>
-            {
-                recipeCategoryList = _context.RecipeCategories.ToList();
-            });
-            return recipeCategoryList;
+
+            recipeCategoryList = _context.RecipeCategories.ToList();
+
+            return Task.FromResult(recipeCategoryList);
         }
     }
 }

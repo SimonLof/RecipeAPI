@@ -13,26 +13,26 @@ namespace RecipeAPI.Data.Repos
             _context = context;
         }
 
-        public async Task<ApplicationUser> GetApplicationUser(int id)
+        public Task<ApplicationUser> GetApplicationUser(int id)
         {
-            return await Task.Run(() => _context.Users.SingleOrDefault(u => u.UserID == id));
+            return Task.FromResult<ApplicationUser>(_context.Users.SingleOrDefault(u => u.UserID == id));
         }
 
-        public async Task<Recipe> GetRecipe(int id)
+        public Task<Recipe> GetRecipe(int id)
         {
-            // Måste köra .Include().ThenInclude() för att få saker "längre bort" i databasen.
-            return _context.Recipes.Include(r => r.User)
+            // Måste köra .Include().ThenInclude() för att inkludera saker "längre bort" i databasen.
+            return Task.FromResult<Recipe>(_context.Recipes.Include(r => r.User)
                 .Include(r => r.Ratings)
                 .ThenInclude(r => r.FromUser)
-                .SingleOrDefault(r => r.RecipeID == id);
+                .SingleOrDefault(r => r.RecipeID == id));
         }
 
-        public async Task<Recipe> PostNewRating(Rating rating)
+        public Task<Recipe> PostNewRating(Rating rating)
         {
             _context.Ratings.Add(rating);
             _context.SaveChanges();
 
-            return rating.OnRecipe;
+            return Task.FromResult(rating.OnRecipe);
         }
     }
 }

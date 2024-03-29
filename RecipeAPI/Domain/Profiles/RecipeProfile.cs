@@ -19,9 +19,6 @@ namespace RecipeAPI.Domain.Profiles
                 .ForMember(dest => dest.AvgRating, option =>
                 option.MapFrom(src => src.Ratings.Count > 0 ?
                     src.Ratings.Select(r => r.Score).Average() : 0));
-
-            // Kanske mappa åt andra hållet?
-            //CreateMap<RecipeViewDTO, Recipe>();
         }
     }
 }
