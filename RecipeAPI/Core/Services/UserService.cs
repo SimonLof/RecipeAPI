@@ -21,11 +21,11 @@ namespace RecipeAPI.Core.Services
             _mapper = mapper;
         }
 
-        public async Task CreateUser(UserDTO userDTO)
+        public async Task<UserDTO> CreateUser(UserDTO userDTO)
         {
             var user = _mapper.Map<ApplicationUser>(userDTO);
 
-            await _repo.CreateUser(user);
+            return _mapper.Map<UserDTO>(await _repo.CreateUser(user));
         }
 
         public async Task<List<UserDTO>> GetUsers()
@@ -44,7 +44,7 @@ namespace RecipeAPI.Core.Services
 
         public async Task<UserDTO> UpdateUser(UserDTO user)
         {
-            ArgumentNullException.ThrowIfNull(user);
+            if (user is null) throw new Exception("Invalid user.");
 
             var updateUser = _mapper.Map<ApplicationUser>(user);
             try
@@ -61,10 +61,10 @@ namespace RecipeAPI.Core.Services
         public async Task<object> Login(UserLoginDTO loginDTO)
         {
             if (string.IsNullOrEmpty(loginDTO.UserName))
-                throw new ArgumentNullException(paramName: "loginDTO.UserName");
+                throw new Exception("Username required.");
 
             if (string.IsNullOrEmpty(loginDTO.Password))
-                throw new ArgumentNullException(paramName: "loginDTO.Password");
+                throw new Exception("Password required.");
 
             var user = await _repo.Login(loginDTO);
 

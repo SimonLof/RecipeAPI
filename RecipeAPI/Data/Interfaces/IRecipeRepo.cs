@@ -5,8 +5,8 @@ namespace RecipeAPI.Data.Interfaces
     public interface IRecipeRepo
     {
         public Task CreateRecipe(Recipe recipe);
-        public Task UpdateRecipe(Recipe recipe);
-        public Task DeleteRecipe(Recipe recipe);
+        public Task<Recipe> UpdateRecipe(Recipe recipe);
+        public Task<string> DeleteRecipe(int id);
         public Task<Recipe> GetRecipe(int id);
         public Task<List<Recipe>> GetRecipes();
         public Task<List<Recipe>> SearchRecipes(string searchCondition);

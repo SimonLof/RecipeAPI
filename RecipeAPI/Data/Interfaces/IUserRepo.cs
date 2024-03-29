@@ -5,7 +5,7 @@ namespace RecipeAPI.Data.Interfaces
 {
     public interface IUserRepo
     {
-        public Task CreateUser(ApplicationUser user);
+        public Task<ApplicationUser> CreateUser(ApplicationUser user);
         public Task UpdateUser(ApplicationUser user);
         public Task DeleteUser(int userID);
         public Task<ApplicationUser> GetUserById(int id);

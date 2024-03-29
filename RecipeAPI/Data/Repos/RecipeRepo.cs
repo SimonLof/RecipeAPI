@@ -37,9 +37,22 @@ namespace RecipeAPI.Data.Repos
             return Task.CompletedTask;
         }
 
-        public Task DeleteRecipe(Recipe recipe)
+        public Task<string> DeleteRecipe(int id)
         {
-            throw new NotImplementedException();
+            var recipe = _context.Recipes
+                .Include(r => r.Ratings)
+                .SingleOrDefault(r => r.RecipeID == id);
+
+            if (recipe is null) throw new Exception("Recipe not found.");
+
+            foreach (var rating in recipe.Ratings)
+            {
+                _context.Ratings.Remove(rating);
+            }
+
+            _context.Recipes.Remove(recipe);
+            _context.SaveChanges();
+            return Task.FromResult(recipe.Name);
         }
 
         public Task<List<Recipe>> GetRecipes()
@@ -53,12 +66,25 @@ namespace RecipeAPI.Data.Repos
 
         public Task<List<Recipe>> SearchRecipes(string searchCondition)
         {
-            throw new NotImplementedException();
+            var recipes = _context.Recipes
+                .Include(r => r.Category)
+                .Include(r => r.User)
+                .Include(r => r.Ratings)
+                .Where(r => r.Name.Contains(searchCondition))
+                .ToList();
+            return Task.FromResult(recipes);
         }
 
-        public Task UpdateRecipe(Recipe recipe)
+        public Task<Recipe> UpdateRecipe(Recipe recipe)
         {
-            throw new NotImplementedException();
+            var original = _context.Recipes.FirstOrDefault(r => r.RecipeID == recipe.RecipeID);
+
+            if (original is null) throw new Exception("Recipe not found.");
+
+            _context.Entry(original).CurrentValues.SetValues(recipe);
+            _context.SaveChanges();
+
+            return Task.FromResult(original);
         }
 
         public Task<Recipe> GetRecipe(int id)
@@ -68,6 +94,7 @@ namespace RecipeAPI.Data.Repos
                 .Include("User")
                 .Include("Ratings")
                 .SingleOrDefault(r => r.RecipeID == id);
+
             if (recipe is null) throw new Exception("Recipe not found");
 
             return Task.FromResult(recipe);

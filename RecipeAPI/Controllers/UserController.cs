@@ -17,7 +17,7 @@ namespace RecipeAPI.Controllers
         }
 
         [Authorize(Roles = "appUser")]
-        [HttpGet("/api/users")]
+        [HttpGet("/api/allusers")]
         public async Task<IActionResult> GetAllUser()
         {
             try
@@ -32,7 +32,7 @@ namespace RecipeAPI.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("/api/{userID}")]
+        [HttpGet("/api/user/{userID}")]
         public async Task<IActionResult> GetUserFromID(int userID)
         {
             try
@@ -47,21 +47,35 @@ namespace RecipeAPI.Controllers
         }
 
 
-        [Authorize("appUser")]
-        [HttpGet("/api/{userID}/delete")]
-        public async Task<IActionResult> DeleteUser(int userID)
+        [Authorize(Roles = "appUser")]
+        [HttpDelete("/api/user/delete")]
+        public async Task<IActionResult> DeleteUser()
+        {
+            try
+            {
+                await _userService.DeleteUser(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+                return Ok("User deleted.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "appUser")]
+        [HttpPut("/api/user/update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO user)
         {
             try
             {
                 var loggedInID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (loggedInID == userID.ToString())
+                if (loggedInID == user.UserID.ToString())
                 {
-                    await _userService.DeleteUser(userID);
-                    return Ok("Your user has been deleted. Be aware that your current JWT might still work for up to 1 hour.");
+                    return Ok(await _userService.UpdateUser(user));
                 }
                 else
                 {
-                    return BadRequest("You can only delete your own account.");
+                    return BadRequest("You can only update your own account.");
                 }
             }
             catch (Exception ex)
@@ -70,14 +84,15 @@ namespace RecipeAPI.Controllers
             }
         }
 
+
         [AllowAnonymous]
-        [HttpPost("/api/register")]
+        [HttpPost("/api/user/register")]
         public async Task<IActionResult> NewUser([FromBody] UserDTO user)
         {
             try
             {
-                await _userService.CreateUser(user);
-                return StatusCode(201, user);
+                var createdUser = await _userService.CreateUser(user);
+                return StatusCode(201, createdUser);
             }
             catch (Exception ex)
             {

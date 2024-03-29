@@ -42,6 +42,14 @@ namespace RecipeAPI.Core.Services
             return readableRecipe;
         }
 
+        public async Task<string> DeleteRecipe(int id, int userID)
+        {
+            var recipe = await _recipeRepo.GetRecipe(id);
+            if (recipe.User.UserID != userID) throw new Exception("Can only delete your own recipes.");
+
+            return await _recipeRepo.DeleteRecipe(id);
+        }
+
         public async Task<List<RecipeViewDTO>> GetAllRecipes()
         {
             var recipes = await _recipeRepo.GetRecipes();
@@ -58,6 +66,32 @@ namespace RecipeAPI.Core.Services
         public async Task<RecipeViewDTO> GetRecipe(int id)
         {
             return _mapper.Map<RecipeViewDTO>(await _recipeRepo.GetRecipe(id));
+        }
+
+        public async Task<List<RecipeViewDTO>> SearchRecipe(string searchCondition)
+        {
+            var results = await _recipeRepo.SearchRecipes(searchCondition);
+
+            List<RecipeViewDTO> readableResults = [];
+            foreach (var recipe in results)
+            {
+                readableResults.Add(_mapper.Map<RecipeViewDTO>(recipe));
+            }
+            return readableResults;
+        }
+
+        public async Task<RecipeViewDTO> UpdateRecipe(RecipeCreationDTO recipe, int recipeID, int userID)
+        {
+            var recipeToUpdate = await _recipeRepo.GetRecipe(recipeID);
+
+            if (recipeToUpdate.User.UserID != userID) throw new Exception("Can only update your own recipes.");
+
+            recipeToUpdate.Category = await _recipeRepo.GetCategory(recipe.CategoryID);
+            recipeToUpdate.Description = recipe.Description;
+            recipeToUpdate.Ingredients = recipe.Ingredients;
+            recipeToUpdate.Name = recipe.Name;
+
+            return _mapper.Map<RecipeViewDTO>(await _recipeRepo.UpdateRecipe(recipeToUpdate));
         }
     }
 }

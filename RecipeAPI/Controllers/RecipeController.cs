@@ -20,16 +20,44 @@ namespace RecipeAPI.Controllers
         [HttpGet("/api/recipes")]
         public async Task<IActionResult> GetAllRecipe()
         {
-            var recipes = await _recipeService.GetAllRecipes();
+            try
+            {
+                var recipes = await _recipeService.GetAllRecipes();
 
-            return Ok(recipes);
+                return Ok(recipes);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [AllowAnonymous]
         [HttpGet("/api/recipe/{recipeID}")]
         public async Task<IActionResult> GetRecipe(int recipeID)
         {
-            return Ok(await _recipeService.GetRecipe(recipeID));
+            try
+            {
+                return Ok(await _recipeService.GetRecipe(recipeID));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("/api/recipe/search/{searchstring}")]
+        public async Task<IActionResult> SearchRecipe(string searchstring)
+        {
+            try
+            {
+                return Ok(await _recipeService.SearchRecipe(searchstring));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize(Roles = "appUser")]
@@ -42,6 +70,39 @@ namespace RecipeAPI.Controllers
                 var createdRecipe = await _recipeService.CreateRecipe(recipe, User.FindFirstValue(ClaimTypes.NameIdentifier));
 
                 return Created("", createdRecipe);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "appUser")]
+        [HttpPut("/api/recipe/{recipeID}/update")]
+        public async Task<IActionResult> UpdateRecipe([FromBody] RecipeCreationDTO recipe, int recipeID)
+        {
+            try
+            {
+                if (recipe == null) return BadRequest("Invalid recipe");
+
+                var userID = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+                return Ok(await _recipeService.UpdateRecipe(recipe, recipeID, userID));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "appUser")]
+        [HttpDelete("/api/recipe/{recipeID}/delete")]
+        public async Task<IActionResult> DeleteRecipe(int recipeID)
+        {
+            try
+            {
+                var recipeName = await _recipeService.DeleteRecipe(recipeID, int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+                return Ok($"{recipeName} deleted!");
             }
             catch (Exception ex)
             {

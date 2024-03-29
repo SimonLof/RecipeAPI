@@ -1,4 +1,5 @@
-﻿using RecipeAPI.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipeAPI.Data.Interfaces;
 using RecipeAPI.Domain.DTO;
 using RecipeAPI.Domain.Entities;
 
@@ -12,18 +13,32 @@ namespace RecipeAPI.Data.Repos
             _context = context;
         }
 
-        public Task CreateUser(ApplicationUser user)
+        public Task<ApplicationUser> CreateUser(ApplicationUser user)
         {
             _context.Users.Add(user);
             _context.SaveChanges();
-            return Task.CompletedTask;
+            return Task.FromResult(user);
         }
 
         public Task DeleteUser(int userID)
         {
-            var user = _context.Users.SingleOrDefault(u => u.UserID == userID);
+            var user = _context.Users
+                .Include(u => u.Ratings)
+                .Include(u => u.UsersRecipes)
+                .SingleOrDefault(u => u.UserID == userID);
 
             if (user == null) throw new Exception("User not found");
+
+            foreach (var rating in user.Ratings)
+            {
+                _context.Ratings.Remove(rating);
+            }
+
+            foreach (var recipe in user.UsersRecipes)
+            {
+                _context.Recipes.Remove(recipe);
+            }
+
 
             _context.Users.Remove(user);
             _context.SaveChanges();
@@ -33,7 +48,7 @@ namespace RecipeAPI.Data.Repos
         public Task<ApplicationUser> Login(UserLoginDTO userLogin)
         {
             return Task.FromResult<ApplicationUser>(
-                _context.Users.SingleOrDefault(u =>
+                _context.Users.FirstOrDefault(u =>
                 u.UserName.ToLower() == userLogin.UserName.ToLower() &&
                 u.Password == userLogin.Password));
         }

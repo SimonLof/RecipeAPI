@@ -15,13 +15,15 @@ namespace RecipeAPI.Data.Repos
 
         public Task<ApplicationUser> GetApplicationUser(int id)
         {
-            return Task.FromResult<ApplicationUser>(_context.Users.SingleOrDefault(u => u.UserID == id));
+            return Task.FromResult<ApplicationUser>(
+                _context.Users.SingleOrDefault(u => u.UserID == id));
         }
 
         public Task<Recipe> GetRecipe(int id)
         {
             // Måste köra .Include().ThenInclude() för att inkludera saker "längre bort" i databasen.
-            return Task.FromResult<Recipe>(_context.Recipes.Include(r => r.User)
+            return Task.FromResult<Recipe>(_context.Recipes
+                .Include(r => r.User)
                 .Include(r => r.Ratings)
                 .ThenInclude(r => r.FromUser)
                 .SingleOrDefault(r => r.RecipeID == id));
