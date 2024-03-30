@@ -1,6 +1,6 @@
 # Recipe API
 
-## Functional Endpoints
+## Endpoints
 
 ### User Endpoints
 
