@@ -2,8 +2,8 @@
 
 namespace RecipeAPI.Data.Interfaces
 {
-    public interface ITestRepo
+    public interface ICategoryRepo
     {
-        Task<List<RecipeCategory>> GetRecipeCategories();
+        Task<List<RecipeCategory>> GetCategories();
     }
 }

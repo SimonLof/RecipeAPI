@@ -3,20 +3,18 @@ using RecipeAPI.Domain.Entities;
 
 namespace RecipeAPI.Data.Repos
 {
-    public class TestRepo : ITestRepo
+    public class CategoryRepo : ICategoryRepo
     {
         private readonly RecipeAPIContext _context;
 
-        public TestRepo(RecipeAPIContext context)
+        public CategoryRepo(RecipeAPIContext context)
         {
             _context = context;
         }
 
-        public Task<List<RecipeCategory>> GetRecipeCategories()
+        public Task<List<RecipeCategory>> GetCategories()
         {
-            var recipeCategoryList = new List<RecipeCategory>();
-
-            recipeCategoryList = _context.RecipeCategories.ToList();
+            var recipeCategoryList = _context.RecipeCategories.ToList();
 
             return Task.FromResult(recipeCategoryList);
         }

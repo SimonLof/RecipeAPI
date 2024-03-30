@@ -48,8 +48,8 @@ builder.Services.AddSwaggerGen(opt =>
 
 
 // test stuff
-builder.Services.AddScoped<ITestRepo, TestRepo>();
-builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // JWT setup
 builder.Services.AddAuthentication(opt =>
