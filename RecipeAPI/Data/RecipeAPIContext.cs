@@ -23,6 +23,12 @@ namespace RecipeAPI.Data
                 .HasOne(r => r.OnRecipe)
                 .WithMany(re => re.Ratings)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Såhär gör man en composite key i databasen, istället för att ha med ett ID.
+            // Skulle funka i det här fallet, eftersom en användare bara får lägga en röst på varje recept.
+            // Men jag lärde mig det försent så det är ID nu.
+            //modelBuilder.Entity<Rating>()
+            //    .HasKey(r => new { r.FromUser, r.OnRecipe });
         }
 
         public virtual DbSet<Rating> Ratings { get; set; }
